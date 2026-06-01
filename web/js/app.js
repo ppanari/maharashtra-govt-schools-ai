@@ -392,6 +392,7 @@ function renderDistrictTable(rows) {
         <td><strong>${d.district}</strong></td>
         <td>${fmt(d.total)}</td>
         <td>${fmt(d.primary)}</td>
+        <td>${fmt(d.upper_primary)}</td>
         <td>${fmt(d.secondary)}</td>
         <td>${fmt(d.higher_secondary)}</td>
         <td>
