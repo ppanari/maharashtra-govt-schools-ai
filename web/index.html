@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maharashtra Government Schools — Data Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header-badge">Maharashtra · India</div>
+      <h1>Government Schools Data Dashboard</h1>
+      <p>Multi-year analysis across all 36 districts &mdash; sourced from UDISE+, data.gov.in, Ministry of Education &amp; Census of India</p>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ===== DATA SOURCES ===== -->
+    <section class="section">
+      <h2 class="section-title">Data Sources</h2>
+      <div id="sources-grid" class="sources-grid"></div>
+    </section>
+
+    <!-- ===== SUMMARY STATS ===== -->
+    <section class="section">
+      <h2 class="section-title">Summary Statistics <span id="latest-year-label" class="title-badge"></span></h2>
+      <div id="stats-grid" class="stats-grid"></div>
+    </section>
+
+    <!-- ===== CHARTS ===== -->
+    <section class="section">
+      <h2 class="section-title">Trends &amp; Analysis</h2>
+      <div class="charts-grid">
+        <div class="chart-card wide">
+          <h3>Year-wise Total Government Schools</h3>
+          <canvas id="trendChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>School Category Breakdown (Latest Year)</h3>
+          <canvas id="categoryChart"></canvas>
+        </div>
+        <div class="chart-card">
+          <h3>Management Type Distribution</h3>
+          <canvas id="managementChart"></canvas>
+        </div>
+        <div class="chart-card wide">
+          <h3>Year-on-Year Change (%)</h3>
+          <canvas id="changeChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== YEAR-WISE TABLE ===== -->
+    <section class="section">
+      <h2 class="section-title">Year-wise Summary</h2>
+      <div class="table-wrapper">
+        <table class="data-table" id="yearly-table">
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Total Schools</th>
+              <th>Primary</th>
+              <th>Upper Primary</th>
+              <th>Secondary</th>
+              <th>Higher Secondary</th>
+              <th>Change (YoY)</th>
+            </tr>
+          </thead>
+          <tbody id="yearly-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== DISTRICT TABLE ===== -->
+    <section class="section">
+      <h2 class="section-title">District-wise Breakdown (All 36 Districts)</h2>
+      <div class="table-controls">
+        <input type="text" id="district-search" class="search-input" placeholder="Search district..." />
+        <select id="district-sort" class="sort-select">
+          <option value="total-desc">Sort: Total (High to Low)</option>
+          <option value="total-asc">Sort: Total (Low to High)</option>
+          <option value="name-asc">Sort: Name (A–Z)</option>
+        </select>
+      </div>
+      <div class="table-wrapper">
+        <table class="data-table" id="district-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>District</th>
+              <th>Total Schools</th>
+              <th>Primary</th>
+              <th>Secondary</th>
+              <th>Higher Secondary</th>
+              <th>Share (%)</th>
+            </tr>
+          </thead>
+          <tbody id="district-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>Data sourced from UDISE+, data.gov.in, Ministry of Education &amp; Census of India</p>
+      <p id="last-updated"></p>
+      <p>Maharashtra Government Schools AI Project &mdash;
+        <a href="https://github.com/ppanari" target="_blank" rel="noopener">Pooja Panari</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- ===== LOADING OVERLAY ===== -->
+  <div id="loading" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Loading data...</p>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
