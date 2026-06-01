@@ -1,6 +1,6 @@
 # Maharashtra Government Schools Data AI Project
 
-A Python-based AI/data project to collect, analyze, and visualize data on the total number of government schools in Maharashtra state, India, from 2014 onwards.
+A Python-based AI/data project to collect, analyze, and visualize data on the total number of government schools in Maharashtra state, India, across all available years.
 
 ---
 
@@ -8,7 +8,7 @@ A Python-based AI/data project to collect, analyze, and visualize data on the to
 
 This project uses Python to:
 - Collect data on government schools in Maharashtra from public sources (UDISE+, data.gov.in, Ministry of Education reports)
-- Clean and process multi-year datasets (2014–present)
+- Clean and process multi-year datasets across all available years
 - Analyze year-on-year trends using statistical and AI/ML techniques
 - Generate visualizations and automated reports
 
@@ -23,7 +23,7 @@ This project uses Python to:
 | Ministry of Education | https://www.education.gov.in | Annual reports and school statistics |
 | Census of India | https://censusindia.gov.in | Educational infrastructure data |
 
-> Data coverage: **2014–present**, focusing on Maharashtra state government schools (primary, upper-primary, secondary, higher-secondary).
+> Data coverage: **All available years**, focusing on Maharashtra state government schools (primary, upper-primary, secondary, higher-secondary).
 
 ---
 
@@ -84,7 +84,7 @@ pip install -r requirements.txt
 
 ### Collect Data
 ```bash
-python main.py --mode collect --start-year 2014 --state Maharashtra
+python main.py --mode collect --state Maharashtra
 ```
 
 ### Process & Clean Data
@@ -104,14 +104,14 @@ python main.py --mode report
 
 ### Full Pipeline (collect → process → analyze → report)
 ```bash
-python main.py --mode all --start-year 2014
+python main.py --mode all
 ```
 
 ---
 
 ## Key Features
 
-- **Multi-year data collection**: Automated fetching from UDISE+ and open government portals for 2014–present
+- **Multi-year data collection**: Automated fetching from UDISE+ and open government portals across all available years
 - **School category breakdown**: Primary, Upper-Primary, Secondary, Higher Secondary
 - **District-level granularity**: Data broken down by all 36 districts of Maharashtra
 - **Management type filter**: Government, Local Body, Government-Aided schools
@@ -128,7 +128,8 @@ Maharashtra Government Schools Summary
 ======================================
 Year    | Total Schools | Primary | Secondary | Change (YoY)
 --------|--------------|---------|-----------|-------------
-2014-15 |    97,000    |  62,000 |   18,000  |     —
+...     |    ...       |  ...    |   ...     |     —
+2014-15 |    97,000    |  62,000 |   18,000  |   +x.x%
 2015-16 |    96,500    |  61,200 |   18,100  |   -0.5%
 ...
 2023-24 |    98,200    |  63,000 |   19,500  |   +0.8%
