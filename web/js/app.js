@@ -103,35 +103,77 @@ function renderStats(yearlyData) {
   `).join('');
 }
 
-// ── Render: Trend Line Chart ─────────────────────────────────
+// ── Render: Trend Line Chart (with forecast) ─────────────────
 
-function renderTrendChart(yearlyData) {
+function renderTrendChart(yearlyData, forecast) {
+  // All labels = historical years + forecast years
+  const forecastYears = forecast ? forecast.forecast_years : [];
+  const allLabels     = [...yearlyData.map(d => d.year), ...forecastYears.map(d => d.year)];
+
+  // Historical dataset: real values for past, null for future
+  const historicalData = [
+    ...yearlyData.map(d => d.total),
+    ...forecastYears.map(() => null)
+  ];
+
+  // Forecast dataset: null for all past years except the last one
+  // (connecting point), then predicted values
+  const forecastData = [
+    ...yearlyData.map((_, i) => i === yearlyData.length - 1 ? yearlyData[i].total : null),
+    ...forecastYears.map(d => d.predicted_total)
+  ];
+
   const ctx = document.getElementById('trendChart').getContext('2d');
   new Chart(ctx, {
     type: 'line',
     data: {
-      labels: yearlyData.map(d => d.year),
-      datasets: [{
-        label: 'Total Schools',
-        data: yearlyData.map(d => d.total),
-        borderColor: '#2e86c1',
-        backgroundColor: 'rgba(46,134,193,0.07)',
-        borderWidth: 2.5,
-        pointRadius: 5,
-        pointHoverRadius: 7,
-        pointBackgroundColor: '#2e86c1',
-        fill: true,
-        tension: 0.35
-      }]
+      labels: allLabels,
+      datasets: [
+        {
+          label: 'Actual Schools',
+          data: historicalData,
+          borderColor: '#2e86c1',
+          backgroundColor: 'rgba(46,134,193,0.07)',
+          borderWidth: 2.5,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          pointBackgroundColor: '#2e86c1',
+          fill: true,
+          tension: 0.35,
+          spanGaps: false
+        },
+        {
+          label: 'Forecast (Linear Regression)',
+          data: forecastData,
+          borderColor: '#e67e22',
+          backgroundColor: 'rgba(230,126,34,0.07)',
+          borderWidth: 2.5,
+          borderDash: [8, 5],          // dashed line = "predicted, not certain"
+          pointRadius: 6,
+          pointHoverRadius: 8,
+          pointBackgroundColor: '#e67e22',
+          pointStyle: 'triangle',      // different shape to distinguish forecasts
+          fill: false,
+          tension: 0.2,
+          spanGaps: false
+        }
+      ]
     },
     options: {
       responsive: true,
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { display: false },
+        legend: {
+          display: true,
+          labels: { usePointStyle: true, padding: 16 }
+        },
         tooltip: {
           callbacks: {
-            label: ctx => ` Schools: ${ctx.raw.toLocaleString('en-IN')}`
+            label: ctx => {
+              if (ctx.raw == null) return null;
+              const tag = ctx.datasetIndex === 1 ? ' (predicted)' : '';
+              return ` ${ctx.dataset.label.split(' ')[0]}: ${ctx.raw.toLocaleString('en-IN')}${tag}`;
+            }
           }
         }
       },
@@ -145,6 +187,49 @@ function renderTrendChart(yearlyData) {
       }
     }
   });
+}
+
+// ── Render: AI Forecast Section ──────────────────────────────
+
+function renderForecast(forecast) {
+  if (!forecast) return;
+
+  // Explanation paragraph
+  document.getElementById('forecast-explanation').textContent = forecast.explanation;
+
+  // One stat card per predicted year
+  const last2324 = 98200;   // latest known value, used to compute predicted change
+  document.getElementById('forecast-grid').innerHTML = forecast.forecast_years.map(fy => {
+    const diffPct = (((fy.predicted_total - last2324) / last2324) * 100).toFixed(1);
+    const sign    = diffPct >= 0 ? '+' : '';
+    const cls     = diffPct >= 0 ? 'positive' : 'negative';
+    return `
+      <div class="stat-card forecast-card">
+        <div class="forecast-tag">Predicted</div>
+        <div class="stat-number">${fy.predicted_total.toLocaleString('en-IN')}</div>
+        <div class="stat-label">Schools in ${fy.year}</div>
+        <div class="stat-change ${cls}">${sign}${diffPct}% vs 2023-24</div>
+      </div>
+    `;
+  }).join('');
+
+  // R² accuracy badge with plain-English meaning
+  const r2pct   = Math.round(forecast.r_squared * 100);
+  const quality = r2pct >= 80 ? 'Strong fit' : r2pct >= 60 ? 'Moderate fit' : 'Weak fit';
+  const qualityCls = r2pct >= 80 ? 'r2-good' : r2pct >= 60 ? 'r2-moderate' : 'r2-weak';
+  document.getElementById('forecast-accuracy').innerHTML = `
+    <div class="r2-badge ${qualityCls}">
+      <span class="r2-label">Model Accuracy (R²)</span>
+      <span class="r2-value">${r2pct}%</span>
+      <span class="r2-quality">${quality}</span>
+    </div>
+    <p class="r2-explain">
+      R² = ${forecast.r_squared} means the straight line explains <strong>${r2pct}% of the variation</strong>
+      in school counts. The remaining ${100 - r2pct}% is due to factors the line can't capture
+      (e.g. policy changes, sudden surges like 2023-24). The lower the R², the wider the
+      uncertainty around the forecast.
+    </p>
+  `;
 }
 
 // ── Render: Doughnut — Category ──────────────────────────────
@@ -348,10 +433,11 @@ async function init() {
 
   renderSources(data.data_sources);
   renderStats(data.yearly_data);
-  renderTrendChart(data.yearly_data);
+  renderTrendChart(data.yearly_data, data.forecast);
   renderCategoryChart(data.yearly_data);
   renderManagementChart(data.management_type_data);
   renderChangeChart(data.yearly_data);
+  renderForecast(data.forecast);
   renderYearlyTable(data.yearly_data);
 
   grandTotal   = data.district_data.reduce((s, d) => s + d.total, 0);

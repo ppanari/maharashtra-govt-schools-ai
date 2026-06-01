@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 import json
 import os
 from datetime import datetime
+import numpy as np
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(BASE_DIR, '..', 'web', 'data')
@@ -205,6 +206,67 @@ def get_base_dataset():
     }
 
 
+def compute_forecast(yearly_data, years_ahead=3):
+    """
+    Trend forecasting using Linear Regression.
+
+    What is Linear Regression?
+    --------------------------
+    Imagine plotting school counts on a graph year by year.
+    Linear regression finds the single best straight line through
+    all those dots — the line that minimises the total error.
+
+    Once we have that line, we simply extend it into the future
+    to get predictions.
+
+    The maths:
+        predicted_total = slope * year_number + intercept
+        - slope     : how many schools are added/removed per year on average
+        - intercept : the starting value when year_number = 0
+        - R²        : how well the line fits (0 = poor, 1.0 = perfect)
+    """
+    x = np.array(range(len(yearly_data)), dtype=float)
+    y = np.array([d['total'] for d in yearly_data], dtype=float)
+
+    # numpy finds the best-fit line in one call
+    slope, intercept = np.polyfit(x, y, 1)
+
+    # R² — how much of the variance the line explains
+    y_pred = slope * x + intercept
+    ss_res = np.sum((y - y_pred) ** 2)
+    ss_tot = np.sum((y - y.mean()) ** 2)
+    r_squared = float(1 - ss_res / ss_tot)
+
+    # Predict the next `years_ahead` years
+    last_year_str = yearly_data[-1]['year']
+    start_yr = int(last_year_str.split('-')[0])
+
+    forecast_years = []
+    for i in range(1, years_ahead + 1):
+        future_x = len(yearly_data) - 1 + i
+        predicted = int(round(slope * future_x + intercept))
+        label = f"{start_yr + i}-{str(start_yr + i + 1)[-2:]}"
+        forecast_years.append({'year': label, 'predicted_total': predicted})
+
+    direction = 'increasing' if slope > 0 else 'decreasing'
+    return {
+        'method': 'Linear Regression',
+        'slope': round(float(slope), 2),
+        'intercept': round(float(intercept), 2),
+        'r_squared': round(r_squared, 4),
+        'trend': direction,
+        'forecast_years': forecast_years,
+        'explanation': (
+            f"A straight line was fitted through {len(yearly_data)} years of data "
+            f"({yearly_data[0]['year']} to {yearly_data[-1]['year']}). "
+            f"The trend shows approximately {abs(int(slope)):,} schools "
+            f"{'added' if slope > 0 else 'closing'} per year on average. "
+            f"R² = {round(r_squared, 4)} means the model explains "
+            f"{round(r_squared * 100, 1)}% of the variation in school counts."
+        )
+    }
+
+
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -220,6 +282,15 @@ def main():
 
     # Build dataset
     dataset = get_base_dataset()
+
+    # Compute AI forecast from historical data
+    dataset["forecast"] = compute_forecast(dataset["yearly_data"])
+    print(f"\n[Forecast] Method: {dataset['forecast']['method']}")
+    print(f"[Forecast] Slope: {dataset['forecast']['slope']} schools/year")
+    print(f"[Forecast] R²: {dataset['forecast']['r_squared']}")
+    for fy in dataset['forecast']['forecast_years']:
+        print(f"[Forecast] {fy['year']}: {fy['predicted_total']:,} schools (predicted)")
+
     dataset["live_data"] = {
         "data_gov_catalog":   data_gov_catalog[:5],
         "udise_live_summary": udise_summary,

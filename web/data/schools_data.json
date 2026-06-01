@@ -96,5 +96,18 @@
       "description": "Decennial census data on educational infrastructure and literacy across India",
       "status": "Active"
     }
-  ]
+  ],
+  "forecast": {
+    "method": "Linear Regression",
+    "slope": -532.86,
+    "intercept": 100099.29,
+    "r_squared": 0.5219,
+    "trend": "decreasing",
+    "forecast_years": [
+      { "year": "2024-25", "predicted_total": 93705 },
+      { "year": "2025-26", "predicted_total": 93172 },
+      { "year": "2026-27", "predicted_total": 92639 }
+    ],
+    "explanation": "A straight line was fitted through 12 years of data (2012-13 to 2023-24). The trend shows approximately 533 schools closing per year on average. R² = 0.52 means the model explains 52% of the variation in school counts — moderate fit, partly because 2023-24 had an unexpected surge."
+  }
 }

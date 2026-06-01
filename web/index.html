@@ -55,6 +55,33 @@
       </div>
     </section>
 
+    <!-- ===== AI FORECAST ===== -->
+    <section class="section">
+      <h2 class="section-title">AI Forecast — Next 3 Years
+        <span class="title-badge">Linear Regression</span>
+      </h2>
+
+      <!-- How it works explanation -->
+      <div class="forecast-explainer">
+        <div class="explainer-icon">🤖</div>
+        <div class="explainer-body">
+          <h3>How does the AI forecast work?</h3>
+          <p>
+            <strong>Step 1 — Plot the data.</strong> We put each year's school count on a graph (x = year, y = number of schools).<br>
+            <strong>Step 2 — Fit a line.</strong> The algorithm (<em>Linear Regression</em>) finds the single straight line that passes as close as possible to all the historical points — minimising the total error.<br>
+            <strong>Step 3 — Extend the line.</strong> We simply read off where that line predicts school counts for future years.
+          </p>
+          <p id="forecast-explanation" class="forecast-note"></p>
+        </div>
+      </div>
+
+      <!-- Forecast stat cards -->
+      <div id="forecast-grid" class="stats-grid"></div>
+
+      <!-- R² accuracy badge -->
+      <div id="forecast-accuracy" class="forecast-accuracy"></div>
+    </section>
+
     <!-- ===== YEAR-WISE TABLE ===== -->
     <section class="section">
       <h2 class="section-title">Year-wise Summary</h2>

@@ -416,3 +416,112 @@ body {
   .container      { padding: 0 16px; }
   .section-title  { font-size: 1.1rem; }
 }
+
+/* ── Forecast Section ─────────────────────────────────────── */
+
+.forecast-explainer {
+  display: flex;
+  gap: 18px;
+  background: #fffbf2;
+  border: 1px solid #f5cba7;
+  border-left: 5px solid #e67e22;
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 28px;
+  align-items: flex-start;
+}
+
+.explainer-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.explainer-body h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.explainer-body p {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.7;
+  margin-bottom: 6px;
+}
+
+.forecast-note {
+  font-style: italic;
+  color: var(--text-muted) !important;
+  font-size: 0.85rem !important;
+  margin-top: 8px !important;
+}
+
+.forecast-card {
+  border-top: 4px solid #e67e22;
+  position: relative;
+}
+
+.forecast-tag {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: #e67e22;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.forecast-accuracy {
+  margin-top: 20px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.r2-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.r2-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.r2-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.r2-quality {
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.r2-good    .r2-value   { color: var(--success); }
+.r2-good    .r2-quality { background: #d5f5e3; color: var(--success); }
+.r2-moderate .r2-value  { color: #f39c12; }
+.r2-moderate .r2-quality{ background: #fef9e7; color: #d68910; }
+.r2-weak    .r2-value   { color: var(--danger); }
+.r2-weak    .r2-quality { background: #fadbd8; color: var(--danger); }
+
+.r2-explain {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
