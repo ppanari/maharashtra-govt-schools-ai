@@ -19,19 +19,79 @@ HEADERS = {
 
 
 def fetch_data_gov_in():
-    """Search data.gov.in catalog for Maharashtra school datasets."""
+    """
+    Search data.gov.in catalog for Maharashtra school datasets, then attempt to
+    download actual records from each found dataset to extract real yearly data.
+    Returns: (catalog_meta, yearly_data)
+    """
     print("[data.gov.in] Searching catalog...")
-    url = "https://api.data.gov.in/catalog/list"
-    params = {"q": "maharashtra government schools", "format": "json", "count": 10}
+    catalog_meta = []
+    yearly_data = []
+
     try:
-        resp = requests.get(url, params=params, headers=HEADERS, timeout=15)
+        resp = requests.get(
+            "https://api.data.gov.in/catalog/list",
+            params={"q": "maharashtra government schools", "format": "json", "count": 10},
+            headers=HEADERS, timeout=15
+        )
         if resp.status_code == 200:
             catalog = resp.json().get("catalog", [])
             print(f"[data.gov.in] Found {len(catalog)} dataset(s)")
-            return [{"title": c.get("title"), "id": c.get("id"), "org": c.get("org")} for c in catalog]
+            catalog_meta = [{"title": c.get("title"), "id": c.get("id"), "org": c.get("org")} for c in catalog]
+
+            # Attempt to fetch actual records from each dataset
+            for item in catalog_meta:
+                resource_id = item.get("id")
+                if not resource_id:
+                    continue
+                try:
+                    rec_resp = requests.get(
+                        f"https://api.data.gov.in/resource/{resource_id}",
+                        params={"format": "json", "limit": 500},
+                        headers=HEADERS, timeout=20
+                    )
+                    if rec_resp.status_code != 200:
+                        continue
+                    records = rec_resp.json().get("records", [])
+                    if not records:
+                        continue
+                    print(f"[data.gov.in] Resource {resource_id}: {len(records)} record(s)")
+
+                    extracted = []
+                    for rec in records:
+                        year_val, total_val = None, None
+                        for key, val in rec.items():
+                            k = key.lower()
+                            if year_val is None and ('year' in k or 'yr' in k):
+                                year_val = str(val).strip()
+                            if total_val is None and any(kw in k for kw in ('total', 'school', 'count', 'number')):
+                                try:
+                                    total_val = int(str(val).replace(',', '').strip())
+                                except (ValueError, TypeError):
+                                    pass
+                        if year_val and total_val and total_val > 0:
+                            extracted.append({"year": year_val, "total": total_val})
+
+                    if extracted:
+                        yearly_data = extracted
+                        break
+                except Exception as e:
+                    print(f"[data.gov.in] Resource {resource_id} fetch failed: {e}")
+
     except Exception as e:
-        print(f"[data.gov.in] Failed: {e}")
-    return []
+        print(f"[data.gov.in] Catalog search failed: {e}")
+
+    # Sort by year and compute year-on-year change
+    yearly_data.sort(key=lambda x: x["year"])
+    for i, row in enumerate(yearly_data):
+        if i == 0:
+            row["change_pct"] = None
+        else:
+            prev = yearly_data[i - 1]["total"]
+            row["change_pct"] = round((row["total"] - prev) / prev * 100, 2) if prev else None
+
+    print(f"[data.gov.in] Extracted {len(yearly_data)} year(s) of real yearly data")
+    return catalog_meta, yearly_data
 
 
 def fetch_udise_summary():
@@ -98,112 +158,6 @@ def fetch_census_india():
         print(f"[censusindia.gov.in] Failed: {e}")
     return {}
 
-
-def get_base_dataset():
-    """
-    Representative Maharashtra government school data compiled from UDISE+ annual reports.
-    Covers all 36 districts and school years 2012-13 through 2023-24.
-    """
-    return {
-        "source_info": {
-            "primary_source": "UDISE+ Portal (udiseplus.gov.in)",
-            "secondary_sources": [
-                "data.gov.in — Government of India Open Data Portal",
-                "Ministry of Education (education.gov.in)",
-                "Census of India (censusindia.gov.in)"
-            ],
-            "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "data_coverage": "Maharashtra State — Government, Local Body & Aided Schools",
-            "note": "Data compiled from public government portals. Live fetch attempted; fallback to UDISE+ report data."
-        },
-        "yearly_data": [
-            {"year": "2012-13", "total": 102673, "primary": 68000, "upper_primary": 18500, "secondary": 11000, "higher_secondary": 5173, "change_pct": None},
-            {"year": "2013-14", "total": 101855, "primary": 67200, "upper_primary": 18300, "secondary": 11100, "higher_secondary": 5255, "change_pct": -0.80},
-            {"year": "2014-15", "total": 97826, "primary": 64000, "upper_primary": 17800, "secondary": 10800, "higher_secondary": 5226, "change_pct": -3.95},
-            {"year": "2015-16", "total": 97003, "primary": 63500, "upper_primary": 17600, "secondary": 10700, "higher_secondary": 5203, "change_pct": -0.84},
-            {"year": "2016-17", "total": 96734, "primary": 63200, "upper_primary": 17500, "secondary": 10800, "higher_secondary": 5234, "change_pct": -0.28},
-            {"year": "2017-18", "total": 96345, "primary": 62900, "upper_primary": 17400, "secondary": 10850, "higher_secondary": 5195, "change_pct": -0.40},
-            {"year": "2018-19", "total": 95878, "primary": 62500, "upper_primary": 17300, "secondary": 10900, "higher_secondary": 5178, "change_pct": -0.48},
-            {"year": "2019-20", "total": 95312, "primary": 62100, "upper_primary": 17200, "secondary": 10900, "higher_secondary": 5112, "change_pct": -0.59},
-            {"year": "2020-21", "total": 95100, "primary": 61900, "upper_primary": 17100, "secondary": 10950, "higher_secondary": 5150, "change_pct": -0.22},
-            {"year": "2021-22", "total": 94671, "primary": 61600, "upper_primary": 17000, "secondary": 10900, "higher_secondary": 5171, "change_pct": -0.45},
-            {"year": "2022-23", "total": 94426, "primary": 61400, "upper_primary": 16900, "secondary": 10950, "higher_secondary": 5176, "change_pct": -0.26},
-            {"year": "2023-24", "total": 98200, "primary": 63000, "upper_primary": 17500, "secondary": 11500, "higher_secondary": 6200, "change_pct": 3.99}
-        ],
-        "district_data": [
-            {"district": "Ahmednagar", "total": 4512, "primary": 3000, "secondary": 1212, "higher_secondary": 300},
-            {"district": "Akola",      "total": 1934, "primary": 1250, "secondary": 534,  "higher_secondary": 150},
-            {"district": "Amravati",   "total": 2345, "primary": 1550, "secondary": 645,  "higher_secondary": 150},
-            {"district": "Aurangabad", "total": 3845, "primary": 2500, "secondary": 1045, "higher_secondary": 300},
-            {"district": "Beed",       "total": 2756, "primary": 1800, "secondary": 756,  "higher_secondary": 200},
-            {"district": "Bhandara",   "total": 1345, "primary": 880,  "secondary": 365,  "higher_secondary": 100},
-            {"district": "Buldhana",   "total": 2678, "primary": 1750, "secondary": 728,  "higher_secondary": 200},
-            {"district": "Chandrapur", "total": 2456, "primary": 1600, "secondary": 656,  "higher_secondary": 200},
-            {"district": "Dhule",      "total": 2123, "primary": 1400, "secondary": 523,  "higher_secondary": 200},
-            {"district": "Gadchiroli", "total": 1876, "primary": 1250, "secondary": 476,  "higher_secondary": 150},
-            {"district": "Gondia",     "total": 1567, "primary": 1050, "secondary": 417,  "higher_secondary": 100},
-            {"district": "Hingoli",    "total": 1345, "primary": 880,  "secondary": 365,  "higher_secondary": 100},
-            {"district": "Jalgaon",    "total": 3956, "primary": 2600, "secondary": 1056, "higher_secondary": 300},
-            {"district": "Jalna",      "total": 2234, "primary": 1450, "secondary": 584,  "higher_secondary": 200},
-            {"district": "Kolhapur",   "total": 2934, "primary": 1900, "secondary": 834,  "higher_secondary": 200},
-            {"district": "Latur",      "total": 2456, "primary": 1600, "secondary": 656,  "higher_secondary": 200},
-            {"district": "Mumbai City",       "total": 678,  "primary": 380,  "secondary": 198, "higher_secondary": 100},
-            {"district": "Mumbai Suburban",   "total": 1234, "primary": 750,  "secondary": 384, "higher_secondary": 100},
-            {"district": "Nagpur",     "total": 3456, "primary": 2200, "secondary": 956,  "higher_secondary": 300},
-            {"district": "Nanded",     "total": 3123, "primary": 2050, "secondary": 873,  "higher_secondary": 200},
-            {"district": "Nandurbar",  "total": 1876, "primary": 1250, "secondary": 476,  "higher_secondary": 150},
-            {"district": "Nashik",     "total": 5234, "primary": 3500, "secondary": 1334, "higher_secondary": 400},
-            {"district": "Osmanabad",  "total": 1876, "primary": 1200, "secondary": 476,  "higher_secondary": 200},
-            {"district": "Palghar",    "total": 2345, "primary": 1550, "secondary": 595,  "higher_secondary": 200},
-            {"district": "Parbhani",   "total": 2123, "primary": 1400, "secondary": 523,  "higher_secondary": 200},
-            {"district": "Pune",       "total": 4256, "primary": 2800, "secondary": 1056, "higher_secondary": 400},
-            {"district": "Raigad",     "total": 2234, "primary": 1450, "secondary": 584,  "higher_secondary": 200},
-            {"district": "Ratnagiri",  "total": 2456, "primary": 1600, "secondary": 656,  "higher_secondary": 200},
-            {"district": "Sangli",     "total": 2645, "primary": 1700, "secondary": 745,  "higher_secondary": 200},
-            {"district": "Satara",     "total": 2867, "primary": 1850, "secondary": 817,  "higher_secondary": 200},
-            {"district": "Sindhudurg", "total": 1345, "primary": 880,  "secondary": 365,  "higher_secondary": 100},
-            {"district": "Solapur",    "total": 3267, "primary": 2100, "secondary": 867,  "higher_secondary": 300},
-            {"district": "Thane",      "total": 3021, "primary": 1900, "secondary": 821,  "higher_secondary": 300},
-            {"district": "Wardha",     "total": 1567, "primary": 1000, "secondary": 467,  "higher_secondary": 100},
-            {"district": "Washim",     "total": 1456, "primary": 950,  "secondary": 406,  "higher_secondary": 100},
-            {"district": "Yavatmal",   "total": 2789, "primary": 1850, "secondary": 739,  "higher_secondary": 200}
-        ],
-        "management_type_data": {
-            "year": "2022-23",
-            "types": [
-                {"type": "Government",        "count": 62456, "percentage": 66.1},
-                {"type": "Local Body",         "count": 18234, "percentage": 19.3},
-                {"type": "Government-Aided",   "count": 13736, "percentage": 14.5},
-                {"type": "Private Unaided",    "count": 1000,  "percentage": 1.1}
-            ]
-        },
-        "data_sources": [
-            {
-                "name": "UDISE+ Portal",
-                "url": "https://udiseplus.gov.in",
-                "description": "Unified District Information System for Education — primary source for school statistics across India",
-                "status": "Active"
-            },
-            {
-                "name": "data.gov.in",
-                "url": "https://data.gov.in",
-                "description": "Government of India Open Data Portal — open datasets on education infrastructure and school counts",
-                "status": "Active"
-            },
-            {
-                "name": "Ministry of Education",
-                "url": "https://www.education.gov.in",
-                "description": "Annual reports and statistical publications on school education in India",
-                "status": "Active"
-            },
-            {
-                "name": "Census of India",
-                "url": "https://censusindia.gov.in",
-                "description": "Decennial census data on educational infrastructure and literacy across India",
-                "status": "Active"
-            }
-        ]
-    }
 
 
 def compute_forecast(yearly_data, years_ahead=3):
@@ -274,29 +228,73 @@ def main():
     print("Maharashtra Government Schools — Data Scraper")
     print("=" * 60)
 
-    # Live fetches
-    data_gov_catalog  = fetch_data_gov_in()
-    udise_summary     = fetch_udise_summary()
-    education_links   = fetch_education_ministry()
-    census_info       = fetch_census_india()
+    # Live fetches from real government sources
+    data_gov_catalog, yearly_data = fetch_data_gov_in()
+    udise_summary                 = fetch_udise_summary()
+    education_links               = fetch_education_ministry()
+    census_info                   = fetch_census_india()
 
-    # Build dataset
-    dataset = get_base_dataset()
-
-    # Compute AI forecast from historical data
-    dataset["forecast"] = compute_forecast(dataset["yearly_data"])
-    print(f"\n[Forecast] Method: {dataset['forecast']['method']}")
-    print(f"[Forecast] Slope: {dataset['forecast']['slope']} schools/year")
-    print(f"[Forecast] R²: {dataset['forecast']['r_squared']}")
-    for fy in dataset['forecast']['forecast_years']:
-        print(f"[Forecast] {fy['year']}: {fy['predicted_total']:,} schools (predicted)")
-
-    dataset["live_data"] = {
-        "data_gov_catalog":   data_gov_catalog[:5],
-        "udise_live_summary": udise_summary,
-        "ministry_links":     education_links[:10],
-        "census_info":        census_info
+    # Build dataset from only live-scraped data
+    dataset = {
+        "source_info": {
+            "primary_source": "UDISE+ Portal (udiseplus.gov.in)",
+            "secondary_sources": [
+                "data.gov.in — Government of India Open Data Portal",
+                "Ministry of Education (education.gov.in)",
+                "Census of India (censusindia.gov.in)"
+            ],
+            "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "note": "All data fetched live from official government sources."
+        },
+        "data_sources": [
+            {
+                "name": "UDISE+ Portal",
+                "url": "https://udiseplus.gov.in",
+                "description": "Unified District Information System for Education — primary source for school statistics across India",
+                "status": "Active"
+            },
+            {
+                "name": "data.gov.in",
+                "url": "https://data.gov.in",
+                "description": "Government of India Open Data Portal — open datasets on education infrastructure and school counts",
+                "status": "Active"
+            },
+            {
+                "name": "Ministry of Education",
+                "url": "https://www.education.gov.in",
+                "description": "Annual reports and statistical publications on school education in India",
+                "status": "Active"
+            },
+            {
+                "name": "Census of India",
+                "url": "https://censusindia.gov.in",
+                "description": "Decennial census data on educational infrastructure and literacy across India",
+                "status": "Active"
+            }
+        ],
+        "yearly_data": yearly_data,
+        "live_data": {
+            "udise_live_summary": udise_summary,
+            "data_gov_catalog":   data_gov_catalog[:5],
+            "ministry_links":     education_links[:10],
+            "census_info":        census_info
+        }
     }
+
+    # Forecast only if real yearly data was successfully fetched
+    if len(yearly_data) >= 2:
+        dataset["forecast"] = compute_forecast(yearly_data)
+        print(f"\n[Forecast] Method: {dataset['forecast']['method']}")
+        print(f"[Forecast] Slope: {dataset['forecast']['slope']} schools/year")
+        print(f"[Forecast] R²: {dataset['forecast']['r_squared']}")
+        for fy in dataset['forecast']['forecast_years']:
+            print(f"[Forecast] {fy['year']}: {fy['predicted_total']:,} schools (predicted)")
+    else:
+        dataset["forecast"] = {
+            "status": "unavailable",
+            "reason": "Real yearly data could not be extracted from live sources."
+        }
+        print("\n[Forecast] Skipped — not enough real yearly data available from live sources.")
 
     out_path = os.path.join(OUTPUT_DIR, 'schools_data.json')
     with open(out_path, 'w', encoding='utf-8') as f:

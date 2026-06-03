@@ -1,0 +1,16 @@
+# SQLite database — 2.3 GB, exceeds GitHub LFS limit; build locally with load_to_db.py
+resources/schools.db
+resources/schools.db-wal
+resources/schools.db-shm
+
+# Raw zip source files
+resources/*.zip
+
+# Debug / temp scripts
+scraper/debug*.py
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/

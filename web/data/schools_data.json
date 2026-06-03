@@ -6,70 +6,8 @@
       "Ministry of Education (education.gov.in)",
       "Census of India (censusindia.gov.in)"
     ],
-    "last_updated": "2024-06-01 00:00:00",
-    "data_coverage": "Maharashtra State — Government, Local Body & Aided Schools",
-    "note": "Data compiled from public government portals. Run scraper/scrape.py to refresh."
-  },
-  "yearly_data": [
-    {"year": "2012-13", "total": 102673, "primary": 68000, "upper_primary": 18500, "secondary": 11000, "higher_secondary": 5173, "change_pct": null},
-    {"year": "2013-14", "total": 101855, "primary": 67200, "upper_primary": 18300, "secondary": 11100, "higher_secondary": 5255, "change_pct": -0.80},
-    {"year": "2014-15", "total": 97826,  "primary": 64000, "upper_primary": 17800, "secondary": 10800, "higher_secondary": 5226, "change_pct": -3.95},
-    {"year": "2015-16", "total": 97003,  "primary": 63500, "upper_primary": 17600, "secondary": 10700, "higher_secondary": 5203, "change_pct": -0.84},
-    {"year": "2016-17", "total": 96734,  "primary": 63200, "upper_primary": 17500, "secondary": 10800, "higher_secondary": 5234, "change_pct": -0.28},
-    {"year": "2017-18", "total": 96345,  "primary": 62900, "upper_primary": 17400, "secondary": 10850, "higher_secondary": 5195, "change_pct": -0.40},
-    {"year": "2018-19", "total": 95878,  "primary": 62500, "upper_primary": 17300, "secondary": 10900, "higher_secondary": 5178, "change_pct": -0.48},
-    {"year": "2019-20", "total": 95312,  "primary": 62100, "upper_primary": 17200, "secondary": 10900, "higher_secondary": 5112, "change_pct": -0.59},
-    {"year": "2020-21", "total": 95100,  "primary": 61900, "upper_primary": 17100, "secondary": 10950, "higher_secondary": 5150, "change_pct": -0.22},
-    {"year": "2021-22", "total": 94671,  "primary": 61600, "upper_primary": 17000, "secondary": 10900, "higher_secondary": 5171, "change_pct": -0.45},
-    {"year": "2022-23", "total": 94426,  "primary": 61400, "upper_primary": 16900, "secondary": 10950, "higher_secondary": 5176, "change_pct": -0.26},
-    {"year": "2023-24", "total": 98200,  "primary": 63000, "upper_primary": 17500, "secondary": 11500, "higher_secondary": 6200, "change_pct": 3.99}
-  ],
-  "district_data": [
-    {"district": "Ahmednagar",       "total": 4512, "primary": 3000, "secondary": 1212, "higher_secondary": 300},
-    {"district": "Akola",            "total": 1934, "primary": 1250, "secondary": 534,  "higher_secondary": 150},
-    {"district": "Amravati",         "total": 2345, "primary": 1550, "secondary": 645,  "higher_secondary": 150},
-    {"district": "Aurangabad",       "total": 3845, "primary": 2500, "secondary": 1045, "higher_secondary": 300},
-    {"district": "Beed",             "total": 2756, "primary": 1800, "secondary": 756,  "higher_secondary": 200},
-    {"district": "Bhandara",         "total": 1345, "primary": 880,  "secondary": 365,  "higher_secondary": 100},
-    {"district": "Buldhana",         "total": 2678, "primary": 1750, "secondary": 728,  "higher_secondary": 200},
-    {"district": "Chandrapur",       "total": 2456, "primary": 1600, "secondary": 656,  "higher_secondary": 200},
-    {"district": "Dhule",            "total": 2123, "primary": 1400, "secondary": 523,  "higher_secondary": 200},
-    {"district": "Gadchiroli",       "total": 1876, "primary": 1250, "secondary": 476,  "higher_secondary": 150},
-    {"district": "Gondia",           "total": 1567, "primary": 1050, "secondary": 417,  "higher_secondary": 100},
-    {"district": "Hingoli",          "total": 1345, "primary": 880,  "secondary": 365,  "higher_secondary": 100},
-    {"district": "Jalgaon",          "total": 3956, "primary": 2600, "secondary": 1056, "higher_secondary": 300},
-    {"district": "Jalna",            "total": 2234, "primary": 1450, "secondary": 584,  "higher_secondary": 200},
-    {"district": "Kolhapur",         "total": 2934, "primary": 1900, "secondary": 834,  "higher_secondary": 200},
-    {"district": "Latur",            "total": 2456, "primary": 1600, "secondary": 656,  "higher_secondary": 200},
-    {"district": "Mumbai City",      "total": 678,  "primary": 380,  "secondary": 198,  "higher_secondary": 100},
-    {"district": "Mumbai Suburban",  "total": 1234, "primary": 750,  "secondary": 384,  "higher_secondary": 100},
-    {"district": "Nagpur",           "total": 3456, "primary": 2200, "secondary": 956,  "higher_secondary": 300},
-    {"district": "Nanded",           "total": 3123, "primary": 2050, "secondary": 873,  "higher_secondary": 200},
-    {"district": "Nandurbar",        "total": 1876, "primary": 1250, "secondary": 476,  "higher_secondary": 150},
-    {"district": "Nashik",           "total": 5234, "primary": 3500, "secondary": 1334, "higher_secondary": 400},
-    {"district": "Osmanabad",        "total": 1876, "primary": 1200, "secondary": 476,  "higher_secondary": 200},
-    {"district": "Palghar",          "total": 2345, "primary": 1550, "secondary": 595,  "higher_secondary": 200},
-    {"district": "Parbhani",         "total": 2123, "primary": 1400, "secondary": 523,  "higher_secondary": 200},
-    {"district": "Pune",             "total": 4256, "primary": 2800, "secondary": 1056, "higher_secondary": 400},
-    {"district": "Raigad",           "total": 2234, "primary": 1450, "secondary": 584,  "higher_secondary": 200},
-    {"district": "Ratnagiri",        "total": 2456, "primary": 1600, "secondary": 656,  "higher_secondary": 200},
-    {"district": "Sangli",           "total": 2645, "primary": 1700, "secondary": 745,  "higher_secondary": 200},
-    {"district": "Satara",           "total": 2867, "primary": 1850, "secondary": 817,  "higher_secondary": 200},
-    {"district": "Sindhudurg",       "total": 1345, "primary": 880,  "secondary": 365,  "higher_secondary": 100},
-    {"district": "Solapur",          "total": 3267, "primary": 2100, "secondary": 867,  "higher_secondary": 300},
-    {"district": "Thane",            "total": 3021, "primary": 1900, "secondary": 821,  "higher_secondary": 300},
-    {"district": "Wardha",           "total": 1567, "primary": 1000, "secondary": 467,  "higher_secondary": 100},
-    {"district": "Washim",           "total": 1456, "primary": 950,  "secondary": 406,  "higher_secondary": 100},
-    {"district": "Yavatmal",         "total": 2789, "primary": 1850, "secondary": 739,  "higher_secondary": 200}
-  ],
-  "management_type_data": {
-    "year": "2022-23",
-    "types": [
-      {"type": "Government",       "count": 62456, "percentage": 66.1},
-      {"type": "Local Body",        "count": 18234, "percentage": 19.3},
-      {"type": "Government-Aided",  "count": 13736, "percentage": 14.5},
-      {"type": "Private Unaided",   "count": 1000,  "percentage": 1.1}
-    ]
+    "last_updated": "2026-06-03 13:51:42",
+    "note": "All data fetched live from official government sources."
   },
   "data_sources": [
     {
@@ -97,17 +35,18 @@
       "status": "Active"
     }
   ],
+  "yearly_data": [],
+  "live_data": {
+    "udise_live_summary": {
+      "page_title": "UDISE+",
+      "stats": {}
+    },
+    "data_gov_catalog": [],
+    "ministry_links": [],
+    "census_info": {}
+  },
   "forecast": {
-    "method": "Linear Regression",
-    "slope": -532.86,
-    "intercept": 100099.29,
-    "r_squared": 0.5219,
-    "trend": "decreasing",
-    "forecast_years": [
-      { "year": "2024-25", "predicted_total": 93705 },
-      { "year": "2025-26", "predicted_total": 93172 },
-      { "year": "2026-27", "predicted_total": 92639 }
-    ],
-    "explanation": "A straight line was fitted through 12 years of data (2012-13 to 2023-24). The trend shows approximately 533 schools closing per year on average. R² = 0.52 means the model explains 52% of the variation in school counts — moderate fit, partly because 2023-24 had an unexpected surge."
+    "status": "unavailable",
+    "reason": "Real yearly data could not be extracted from live sources."
   }
 }

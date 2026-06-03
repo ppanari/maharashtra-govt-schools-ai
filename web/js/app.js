@@ -2,13 +2,10 @@
    Maharashtra Schools Dashboard — app.js
    ============================================================ */
 
-const DATA_URL = 'data/schools_data.json';
+const DATA_URL = '/api/data';
 
 const SOURCE_ICONS = {
-  'UDISE+ Portal':        '🏫',
-  'data.gov.in':          '🗄️',
-  'Ministry of Education':'📘',
-  'Census of India':      '🗺️'
+  'UDISE+ Microdata': '🏫',
 };
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -37,9 +34,8 @@ async function loadData() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (e) {
-    showError('Could not load <code>data/schools_data.json</code>. ' +
-      'Open this page via a local server (e.g. <code>npx serve web</code>), ' +
-      'or run the scraper first: <code>cd scraper &amp;&amp; python scrape.py</code>');
+    showError('Could not reach <code>/api/data</code>. ' +
+      'Start the server first: <code>python server.py</code> from the project root.');
     return null;
   }
 }
